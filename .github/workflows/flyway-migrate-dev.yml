@@ -1,0 +1,36 @@
+name: Flyway Migrate - DEV
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "migrations/**"
+  workflow_dispatch: {}
+
+jobs:
+  migrate-dev:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run Flyway migrate against DEV
+        run: |
+          docker run --rm \
+            -v "${{ github.workspace }}/migrations:/flyway/sql" \
+            flyway/flyway:11 \
+            -url="${{ secrets.DEV_DB_URL }}" \
+            -user="${{ secrets.DEV_DB_USER }}" \
+            -password="${{ secrets.DEV_DB_PASSWORD }}" \
+            migrate
+
+      - name: Show schema history (proof of tracked state)
+        run: |
+          docker run --rm \
+            -v "${{ github.workspace }}/migrations:/flyway/sql" \
+            flyway/flyway:11 \
+            -url="${{ secrets.DEV_DB_URL }}" \
+            -user="${{ secrets.DEV_DB_USER }}" \
+            -password="${{ secrets.DEV_DB_PASSWORD }}" \
+            info
