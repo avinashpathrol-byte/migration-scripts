@@ -1,0 +1,1 @@
+ALTER TABLE spike12_pipeline_check ADD COLUMN UserRoles INTEGER DEFAULT 0;
